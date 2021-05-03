@@ -23,7 +23,13 @@ def is_variable_name(expr) -> bool:
 
 class Eva:
 
-    def __init__(self, global_env: Environment = Environment()):
+    def __init__(self,
+                 global_env: Environment = Environment({
+                     "null": None,
+                     "true": True,
+                     "false": False,
+                     "VERSION": '0.1'
+                 })):
         self.global_env = global_env
 
     def eval(self, expr, environment: Environment = None):
@@ -39,7 +45,7 @@ class Eva:
             return self.eval(expr[1]) * self.eval(expr[2])
         elif expr[0] == 'var':
             _, name, value = expr
-            return environment.define(name, value)
+            return environment.define(name, self.eval(value))
         elif is_variable_name(expr):
             return environment.lookup(expr)
         else:

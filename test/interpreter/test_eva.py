@@ -17,4 +17,9 @@ assert eva.eval(['+', ['*', 2, 3], 4]) == 10
 assert eva.eval(['var', 'x', 10]) == 10
 
 assert eva.eval('x') == 10
-assert eva.eval('y') == 10
+
+assert eva.eval("true") is True
+
+assert eva.eval(['var', 'x', "true"]) is True
+
+assert eva.eval(['var', 'x', ['*', 2, 2]]) == 4
