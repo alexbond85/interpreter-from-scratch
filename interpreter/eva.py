@@ -33,6 +33,7 @@ class Eva:
                      "VERSION": '0.1'
                  })
         self.global_env = global_env
+        self.invironments = {'0env':self.global_env}
 
     def eval(self, expr, environment: Environment = None):
         if environment is None:
@@ -50,6 +51,7 @@ class Eva:
             return environment.define(name, self.eval(value, environment))
         if expr[0] == 'begin':
             block_env = Environment(None, parent=environment)
+            self.invironments[str(expr)] = block_env
             return self._eval_block(expr, block_env)
         if expr[0] == 'set':
             _, name, value = expr

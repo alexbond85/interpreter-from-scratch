@@ -6,6 +6,12 @@ class Environment:
         self.record = record
         self.parent = parent
 
+    def __str__(self):
+        return str({'record': self.record, 'parent': self.parent})
+
+    def __repr__(self):
+        return f"'record': {self.record}, \n \t \t \t \t 'parent': {self.parent}\n"
+
     def define(self, name, value):
         self.record[name] = value
         return value
