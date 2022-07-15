@@ -88,3 +88,21 @@ def test_integer():
     text = "12 + 24"
     interpreter = Interpreter(text)
     assert interpreter.integer() == 12
+
+
+def test_term():
+    text = "12 + 24"
+    interpreter = Interpreter(text)
+    interpreter.current_token = interpreter.get_next_token()
+    assert interpreter.term() == 12
+    assert interpreter.current_token == Token(TokenType.PLUS, '+')
+    interpreter.current_token = interpreter.get_next_token()
+    assert interpreter.term() == 24
+
+
+def test_complex_expression():
+    text = "10 + 11 + 12"
+    interpreter = Interpreter(text)
+    assert interpreter.expr() == 33
+
+

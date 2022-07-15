@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import NoReturn, Optional
+from typing import Any, NoReturn, Optional
 
 from interpreter.token import Token, TokenType
 
@@ -82,6 +82,11 @@ class Interpreter(object):
         else:
             self.error()
 
+    def term(self) -> Any:
+        token = self.current_token
+        self.eat(TokenType.INTEGER)
+        return token.value
+
     def expr(self) -> int:
         """expr -> INTEGER PLUS INTEGER
         Two steps: parsing and interpreting.
@@ -89,33 +94,26 @@ class Interpreter(object):
           or put differently, the process of recognizing a phrase in the
           stream of tokens.
         - Interpreting: performs addition/subtraction.
+
+        A syntax diagram is a graphical representation of a programming
+        language’s syntax rules.
+
+        Syntax diagrams serve two main purposes:
+        - They graphically represent the specification (grammar) of
+          a programming language.
+        - They can be used to help you write your parser - you can
+          map a diagram to code by following simple rules.
         """
         # set current token to the first token taken from the input
         self.current_token = self.get_next_token()
-
-        # we expect the current token to be a single-digit integer
-        left = self.current_token
-        self.eat(TokenType.INTEGER)
-
-        # we expect the current token to be a '+' token
-        op = self.current_token
-        if op.type_ == TokenType.PLUS:
-            self.eat(TokenType.PLUS)
-        else:
-            self.eat(TokenType.MINUS)
-
-        # we expect the current token to be a single-digit integer
-        right = self.current_token
-        self.eat(TokenType.INTEGER)
-        # after the above call the self.current_token is set to
-        # EOF token
-
-        # at this point INTEGER PLUS INTEGER sequence of tokens
-        # has been successfully found and the method can just
-        # return the result of adding two integers, thus
-        # effectively interpreting client input
-        if op.type_ == TokenType.PLUS:
-            result = left.value + right.value
-        else:
-            result = left.value - right.value
+        result = self.term()
+        arithmethic_ops = (TokenType.PLUS, TokenType.MINUS)
+        while self.current_token and self.current_token.type_ in arithmethic_ops:
+            token = self.current_token
+            if token.type_ == TokenType.PLUS:
+                self.eat(TokenType.PLUS)
+                result = result + self.term()
+            elif token.type_ == TokenType.MINUS:
+                self.eat(TokenType.MINUS)
+                result = result - self.term()
         return result
