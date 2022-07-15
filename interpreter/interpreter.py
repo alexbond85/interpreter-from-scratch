@@ -1,6 +1,12 @@
+from dataclasses import dataclass
 from typing import NoReturn, Optional
 
 from interpreter.token import Token, TokenType
+
+
+@dataclass
+class InterpreterError(Exception):
+    error_msg: str
 
 
 class Interpreter(object):
@@ -16,9 +22,29 @@ class Interpreter(object):
         self.pos = 0
         # current token instance
         self.current_token: Optional[Token] = None
+        self.current_char: Optional[str] = self.text[self.pos]
+
+    def advance(self) -> None:
+        """Advance the 'pos' pointer and set the 'current_char' variable."""
+        self.pos += 1
+        if self.pos > len(self.text) - 1:
+            self.current_char = None  # Indicates end of input
+        else:
+            self.current_char = self.text[self.pos]
+
+    def skip_whitespace(self):
+        while self.current_char is not None and self.current_char.isspace():
+            self.advance()
+
+    def integer(self) -> int:
+        result = ""
+        while self.current_char is not None and self.current_char.isdigit():
+            result += self.current_char
+            self.advance()
+        return int(result)
 
     def error(self) -> NoReturn:
-        raise Exception("Error parsing input")
+        raise InterpreterError("Error parsing input")
 
     def get_next_token(self) -> Token:
         """Lexical analyzer (also known as scanner or tokenizer)
@@ -26,33 +52,24 @@ class Interpreter(object):
         This method is responsible for breaking a sentence
         apart into tokens. One token at a time.
         """
-        text = self.text
 
-        # is self.pos index past the end of the self.text ?
-        # if so, then return EOF token because there is no more
-        # input left to convert into tokens
-        if self.pos > len(text) - 1:
-            return Token(TokenType.EOF, None)
+        while self.current_char is not None:
+            if self.current_char.isspace():
+                self.skip_whitespace()
+                continue
 
-        # get a character at the position self.pos and decide
-        # what token to create based on the single character
-        current_char = text[self.pos]
+            if self.current_char.isdigit():
+                return Token(TokenType.INTEGER, self.integer())
 
-        # if the character is a digit then convert it to
-        # integer, create an INTEGER token, increment self.pos
-        # index to point to the next character after the digit,
-        # and return the INTEGER token
-        if current_char.isdigit():
-            token: Token = Token(TokenType.INTEGER, int(current_char))
-            self.pos += 1
-            return token
+            if self.current_char == "+":
+                self.advance()
+                return Token(TokenType.PLUS, "+")
 
-        if current_char == "+":
-            token = Token(TokenType.PLUS, current_char)
-            self.pos += 1
-            return token
-
-        self.error()
+            if self.current_char == "-":
+                self.advance()
+                return Token(TokenType.MINUS, "-")
+            self.error()
+        return Token(TokenType.EOF, None)
 
     def eat(self, token_type: TokenType) -> None:
         # compare the current token type with the passed token
@@ -75,8 +92,11 @@ class Interpreter(object):
         self.eat(TokenType.INTEGER)
 
         # we expect the current token to be a '+' token
-        # op = self.current_token
-        self.eat(TokenType.PLUS)
+        op = self.current_token
+        if op.type_ == TokenType.PLUS:
+            self.eat(TokenType.PLUS)
+        else:
+            self.eat(TokenType.MINUS)
 
         # we expect the current token to be a single-digit integer
         right = self.current_token
@@ -88,5 +108,8 @@ class Interpreter(object):
         # has been successfully found and the method can just
         # return the result of adding two integers, thus
         # effectively interpreting client input
-        result = left.value + right.value
+        if op.type_ == TokenType.PLUS:
+            result = left.value + right.value
+        else:
+            result = left.value - right.value
         return result

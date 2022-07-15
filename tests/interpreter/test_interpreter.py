@@ -18,8 +18,6 @@ def test_interpreter_moving_position():
     assert interpreter.pos == 3
     interpreter.get_next_token()
     assert interpreter.pos == 3
-    interpreter.get_next_token()
-    assert interpreter.pos == 3
 
 
 def test_interpreter_get_next_token():
@@ -46,13 +44,47 @@ def test_interpreter_eat():
     assert interpreter.current_token == Token(TokenType.INTEGER, 2)
     interpreter.eat(TokenType.INTEGER)
     assert interpreter.current_token == Token(TokenType.EOF, None)
-    interpreter.eat(TokenType.EOF)
-    assert interpreter.current_token == Token(TokenType.EOF, None)
-    interpreter.eat(TokenType.EOF)
-    assert interpreter.current_token == Token(TokenType.EOF, None)
 
 
 def test_expr():
-    text = "1+2"
+    text = " 1  +   2 "
     interpreter = Interpreter(text)
     assert interpreter.expr() == 3
+    text = " 10  -   22 "
+    interpreter = Interpreter(text)
+    assert interpreter.expr() == -12
+
+
+def test_advance():
+    text = "1 + 2"
+    interpreter = Interpreter(text)
+    assert interpreter.current_char == "1"
+    interpreter.advance()
+    assert interpreter.current_char == " "
+    interpreter.advance()
+    assert interpreter.current_char == "+"
+    interpreter.advance()
+    assert interpreter.current_char == " "
+    interpreter.advance()
+    assert interpreter.current_char == "2"
+    interpreter.advance()
+    assert interpreter.current_char is None
+    interpreter.advance()
+    assert interpreter.current_char is None
+
+
+def test_skip_whitespace():
+    text = "1 + 2"
+    interpreter = Interpreter(text)
+    interpreter.skip_whitespace()
+    assert interpreter.current_char == "1"
+    text = "    1 + 2"
+    interpreter = Interpreter(text)
+    interpreter.skip_whitespace()
+    assert interpreter.current_char == "1"
+
+
+def test_integer():
+    text = "12 + 24"
+    interpreter = Interpreter(text)
+    assert interpreter.integer() == 12

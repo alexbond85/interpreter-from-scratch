@@ -15,6 +15,7 @@ class TokenType(Enum):
     INTEGER = auto()
     PLUS = auto()
     EOF = auto()
+    MINUS = auto()
 
 
 @dataclass
