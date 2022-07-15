@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import NoReturn, Optional, cast
 
 from interpreter.token import Token, TokenType
 
@@ -16,7 +16,7 @@ class Interpreter(object):
         # current token instance
         self.current_token: Optional[Token] = None
 
-    def error(self):
+    def error(self) -> NoReturn:
         raise Exception('Error parsing input')
 
     def get_next_token(self) -> Token:
@@ -58,7 +58,8 @@ class Interpreter(object):
         # type and if they match then "eat" the current token
         # and assign the next token to the self.current_token,
         # otherwise raise an exception.
-        if self.current_token.type_ == token_type:
+        # current_token: Token = self.current_token
+        if self.current_token and self.current_token.type_ == token_type:
             self.current_token = self.get_next_token()
         else:
             self.error()
