@@ -18,6 +18,8 @@ class TokenType(Enum):
     PLUS = auto()
     EOF = auto()
     MINUS = auto()
+    MUL = auto()
+    DIV = auto()
 
 
 @dataclass

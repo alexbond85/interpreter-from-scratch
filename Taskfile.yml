@@ -9,3 +9,4 @@ tasks:
         black interpreter tests
         mypy interpreter
         flake8 interpreter tests
+        pytest tests
