@@ -1,4 +1,4 @@
-from typing import NoReturn, Optional, cast
+from typing import NoReturn, Optional
 
 from interpreter.token import Token, TokenType
 
@@ -8,6 +8,7 @@ class Interpreter(object):
     Processes and executes the source program without
     translating it into machine language first.
     """
+
     def __init__(self, text: str):
         # client string input, e.g. "3+5"
         self.text = text
@@ -17,7 +18,7 @@ class Interpreter(object):
         self.current_token: Optional[Token] = None
 
     def error(self) -> NoReturn:
-        raise Exception('Error parsing input')
+        raise Exception("Error parsing input")
 
     def get_next_token(self) -> Token:
         """Lexical analyzer (also known as scanner or tokenizer)
@@ -46,7 +47,7 @@ class Interpreter(object):
             self.pos += 1
             return token
 
-        if current_char == '+':
+        if current_char == "+":
             token = Token(TokenType.PLUS, current_char)
             self.pos += 1
             return token
@@ -74,7 +75,7 @@ class Interpreter(object):
         self.eat(TokenType.INTEGER)
 
         # we expect the current token to be a '+' token
-        op = self.current_token
+        # op = self.current_token
         self.eat(TokenType.PLUS)
 
         # we expect the current token to be a single-digit integer

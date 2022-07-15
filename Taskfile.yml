@@ -1,0 +1,11 @@
+
+version: '3'
+
+
+tasks:
+  default:
+    cmds:
+      - |
+        black interpreter tests
+        mypy interpreter
+        flake8 interpreter

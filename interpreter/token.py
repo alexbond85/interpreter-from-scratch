@@ -22,6 +22,7 @@ class Token(object):
     """
     A token is an object that has a type and a value.
     """
+
     type_: TokenType
     value: Any
 
@@ -32,9 +33,8 @@ class Token(object):
             Token(INTEGER, 3)
             Token(PLUS '+')
         """
-        return 'Token({type}, {value})'.format(
-            type=self.type_,
-            value=repr(self.value)
+        return "Token({type}, {value})".format(
+            type=self.type_, value=repr(self.value)
         )
 
     def __repr__(self):
