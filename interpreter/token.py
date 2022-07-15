@@ -10,6 +10,8 @@ from typing import Any
 # The process of breaking the input string into tokens
 # is called lexical analysis (lexer, scanner or tokenizer).
 
+# A lexeme is a sequence of characters that form a token.
+
 
 class TokenType(Enum):
     INTEGER = auto()

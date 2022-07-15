@@ -83,7 +83,13 @@ class Interpreter(object):
             self.error()
 
     def expr(self) -> int:
-        """expr -> INTEGER PLUS INTEGER"""
+        """expr -> INTEGER PLUS INTEGER
+        Two steps: parsing and interpreting.
+        - Parsing is the process of finding the structure in the stream of tokens,
+          or put differently, the process of recognizing a phrase in the
+          stream of tokens.
+        - Interpreting: performs addition/subtraction.
+        """
         # set current token to the first token taken from the input
         self.current_token = self.get_next_token()
 
