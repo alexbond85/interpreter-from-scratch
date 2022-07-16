@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import NoReturn
 
+from interpreter.ast import AST, BinOp, Num
 from interpreter.lexer import Lexer
 from interpreter.token import Token, TokenType
 
@@ -28,28 +29,52 @@ class Parser:
         else:
             self._error()
 
-    def factor(self) -> None:
-        """Parse integer.
-        factor : INTEGER
-        """
-        self.eat(TokenType.INTEGER)
+    def factor(self) -> AST:
+        """factor : INTEGER | LPAREN expr RPAREN"""
+        token = self.current_token
+        if token.type_ == TokenType.INTEGER:
+            self.eat(TokenType.INTEGER)
+            return Num(token)
+        elif token.type_ == TokenType.LPAREN:
+            self.eat(TokenType.LPAREN)
+            node = self.expr()
+            self.eat(TokenType.RPAREN)
+            return node
+        self._error()
 
-    def expr(self):
-        """Arithmetic expression parser.
-        Grammar:
-        expr   : factor ((MUL | DIV) factor)*
-        factor : INTEGER
-        """
-        self.factor()
+    def term(self) -> AST:
+        """term : factor ((MUL | DIV) factor)*"""
+        node = self.factor()
 
         while self.current_token.type_ in (TokenType.MUL, TokenType.DIV):
             token = self.current_token
             if token.type_ == TokenType.MUL:
                 self.eat(TokenType.MUL)
-                self.factor()
             elif token.type_ == TokenType.DIV:
                 self.eat(TokenType.DIV)
-                self.factor()
+
+            node = BinOp(left=node, op=token, right=self.factor())
+
+        return node
+
+    def expr(self) -> AST:
+        """
+        expr   : term ((PLUS | MINUS) term)*
+        term   : factor ((MUL | DIV) factor)*
+        factor : INTEGER | LPAREN expr RPAREN
+        """
+        node = self.term()
+
+        while self.current_token.type_ in (TokenType.PLUS, TokenType.MINUS):
+            token = self.current_token
+            if token.type_ == TokenType.PLUS:
+                self.eat(TokenType.PLUS)
+            elif token.type_ == TokenType.MINUS:
+                self.eat(TokenType.MINUS)
+
+            node = BinOp(left=node, op=token, right=self.term())
+
+        return node
 
     def parse(self):
         self.expr()
