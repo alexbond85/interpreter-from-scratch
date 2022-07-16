@@ -73,6 +73,14 @@ class Lexer:
                 self._advance()
                 return Token(TokenType.MINUS, "-")
 
+            if self.current_char == "(":
+                self._advance()
+                return Token(TokenType.LPAREN, "(")
+
+            if self.current_char == ")":
+                self._advance()
+                return Token(TokenType.RPAREN, ")")
+
             self._error()
 
         return Token(TokenType.EOF, None)

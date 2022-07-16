@@ -18,7 +18,7 @@ class Interpreter(object):
 
     def __init__(self, lexer: Lexer):
         self.lexer = lexer
-        self.current_token = lexer.get_next_token()
+        self.current_token: Token = lexer.get_next_token()
 
     def error(self) -> NoReturn:
         raise InterpreterError("Error parsing input")
@@ -34,14 +34,17 @@ class Interpreter(object):
         else:
             self.error()
 
-    def factor(self) -> int:
-        """Return an INTEGER token value.
-
-        factor : INTEGER
-        """
-        token: Token = self.current_token
-        self.eat(TokenType.INTEGER)
-        return int(token.value)
+    def factor(self):
+        """factor : INTEGER | LPAREN expr RPAREN"""
+        token = self.current_token
+        if token.type_ == TokenType.INTEGER:
+            self.eat(TokenType.INTEGER)
+            return token.value
+        elif token.type_ == TokenType.LPAREN:
+            self.eat(TokenType.LPAREN)
+            result = self.expr()
+            self.eat(TokenType.RPAREN)
+            return result
 
     def term(self):
         """term : factor ((MUL | DIV) factor)*"""

@@ -28,7 +28,9 @@ def test_expr():
     text = " 10  -   1 * 2 * 3"
     interpreter = Interpreter(Lexer(text))
     assert interpreter.expr() == 4
-
+    text = " (1 + 2) * 3"
+    interpreter = Interpreter(Lexer(text))
+    assert interpreter.expr() == 9
 
 
 def test_complex_expression():
