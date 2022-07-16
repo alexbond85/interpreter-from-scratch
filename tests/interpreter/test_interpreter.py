@@ -22,6 +22,13 @@ def test_expr():
     text = " 10  -   22 "
     interpreter = Interpreter(Lexer(text))
     assert interpreter.expr() == -12
+    text = " 10  -   22 * 0"
+    interpreter = Interpreter(Lexer(text))
+    assert interpreter.expr() == 10
+    text = " 10  -   1 * 2 * 3"
+    interpreter = Interpreter(Lexer(text))
+    assert interpreter.expr() == 4
+
 
 
 def test_complex_expression():

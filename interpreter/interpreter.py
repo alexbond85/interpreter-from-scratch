@@ -43,16 +43,11 @@ class Interpreter(object):
         self.eat(TokenType.INTEGER)
         return int(token.value)
 
-    def expr(self) -> int:
-        """Arithmetic expression parser / interpreter.
-
-        expr   : factor ((MUL | DIV) factor)*
-        factor : INTEGER
-        """
-        # set current token to the first token taken from the input
+    def term(self):
+        """term : factor ((MUL | DIV) factor)*"""
         result = self.factor()
-        ops = (TokenType.MUL, TokenType.DIV, TokenType.PLUS, TokenType.MINUS)
-        while self.current_token.type_ in ops:
+
+        while self.current_token.type_ in (TokenType.MUL, TokenType.DIV):
             token = self.current_token
             if token.type_ == TokenType.MUL:
                 self.eat(TokenType.MUL)
@@ -60,11 +55,26 @@ class Interpreter(object):
             elif token.type_ == TokenType.DIV:
                 self.eat(TokenType.DIV)
                 result = result // self.factor()
-            elif token.type_ == TokenType.PLUS:
+
+        return result
+
+    def expr(self) -> int:
+        """Arithmetic expression parser / interpreter.
+        calc>  14 + 2 * 3 - 6 / 2
+        17
+        expr   : term ((PLUS | MINUS) term)*
+        term   : factor ((MUL | DIV) factor)*
+        factor : INTEGER
+        """
+        result = self.term()
+
+        while self.current_token.type_ in (TokenType.PLUS, TokenType.MINUS):
+            token = self.current_token
+            if token.type_ == TokenType.PLUS:
                 self.eat(TokenType.PLUS)
-                result = result + self.factor()
+                result = result + self.term()
             elif token.type_ == TokenType.MINUS:
                 self.eat(TokenType.MINUS)
-                result = result - self.factor()
+                result = result - self.term()
 
         return result
