@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Callable
 
 from interpreter.token import Token
 
@@ -28,10 +29,17 @@ class Num(AST):
         self.value = self.token.value
 
 
+class UnaryOp(AST):
+    def __init__(self, op: Token, expr: AST):
+        self.token = op
+        self.op = op
+        self.expr = expr
+
+
 class NodeVisitor:
     def visit(self, node):
         method_name = "visit_" + type(node).__name__
-        visitor = getattr(self, method_name, self.generic_visit)
+        visitor: Callable = getattr(self, method_name, self.generic_visit)
         return visitor(node)
 
     def generic_visit(self, node):

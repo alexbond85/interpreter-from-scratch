@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import NoReturn
 
-from interpreter.ast import AST, BinOp, Num
+from interpreter.ast import AST, BinOp, Num, UnaryOp
 from interpreter.lexer import Lexer
 from interpreter.token import Token, TokenType
 
@@ -32,6 +32,14 @@ class Parser:
     def factor(self) -> AST:
         """factor : INTEGER | LPAREN expr RPAREN"""
         token = self.current_token
+        if token.type_ == TokenType.PLUS:
+            self.eat(TokenType.PLUS)
+            node = UnaryOp(token, self.factor())
+            return node
+        elif token.type_ == TokenType.MINUS:
+            self.eat(TokenType.MINUS)
+            node = UnaryOp(token, self.factor())
+            return node
         if token.type_ == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
             return Num(token)

@@ -3,7 +3,7 @@ from typing import Callable, NoReturn
 
 
 from interpreter.parser import Parser
-from interpreter.ast import Num, BinOp
+from interpreter.ast import Num, BinOp, UnaryOp
 from interpreter.token import TokenType
 
 
@@ -50,6 +50,13 @@ class Interpreter(NodeVisitor):
 
     def visit_Num(self, node: Num) -> int:
         return node.value
+
+    def visit_UnaryOp(self, node: UnaryOp) -> int:
+        op = node.op.type_
+        if op == TokenType.PLUS:
+            return +self.visit(node.expr)
+        elif op == TokenType.MINUS:
+            return -self.visit(node.expr)
 
     def run(self) -> int:
         return self.visit(self.parser.expr())

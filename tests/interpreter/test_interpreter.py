@@ -27,6 +27,9 @@ def test_run():
     text = " (1 + 2) * 3"
     interpreter = Interpreter(Parser(Lexer(text)))
     assert interpreter.run() == 9
+    text = " (1 - + - 2) * 3"
+    interpreter = Interpreter(Parser(Lexer(text)))
+    assert interpreter.run() == 9
 
 
 def test_complex_expression():
