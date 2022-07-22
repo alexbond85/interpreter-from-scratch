@@ -22,6 +22,12 @@ class TokenType(Enum):
     DIV = auto()
     LPAREN = auto()
     RPAREN = auto()
+    BEGIN = auto()
+    END = auto()
+    ID = auto()
+    SEMI = auto()
+    ASSIGN = auto()
+    DOT = auto()
 
 
 @dataclass

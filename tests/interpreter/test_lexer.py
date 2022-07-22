@@ -45,7 +45,7 @@ def test_integer():
     assert lexer._integer() == 12
 
 
-def test_interpreter_get_next_token():
+def test_get_next_token():
     text = "1   +  2  - "
     lexer = Lexer(text)
     token = lexer.get_next_token()
@@ -58,3 +58,11 @@ def test_interpreter_get_next_token():
     assert token == Token(TokenType.MINUS, value="-")
     token = lexer.get_next_token()
     assert token == Token(TokenType.EOF, None)
+    lexer = Lexer('BEGIN a := 2; END.')
+    assert lexer.get_next_token() == Token(TokenType.BEGIN, "BEGIN")
+    assert lexer.get_next_token() == Token(TokenType.ID, "a")
+    assert lexer.get_next_token() == Token(TokenType.ASSIGN, ":=")
+    assert lexer.get_next_token() == Token(TokenType.INTEGER, 2)
+    assert lexer.get_next_token() == Token(TokenType.SEMI, ";")
+    assert lexer.get_next_token() == Token(TokenType.END, "END")
+    assert lexer.get_next_token() == Token(TokenType.DOT, ".")

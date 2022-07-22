@@ -1,6 +1,12 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from interpreter.token import Token, TokenType
+
+RESERVED_KEYWORDS = {
+    'BEGIN': Token(TokenType.BEGIN, 'BEGIN'),
+    'END': Token(TokenType.END, 'END'),
+}
 
 
 @dataclass
@@ -43,6 +49,22 @@ class Lexer:
             self._advance()
         return int(result)
 
+    def _id(self):
+        """Handle identifiers and reserved keywords"""
+        result = ''
+        while self.current_char is not None and self.current_char.isalnum():
+            result += self.current_char
+            self._advance()
+
+        token = RESERVED_KEYWORDS.get(result, Token(TokenType.ID, result))
+        return token
+
+    def _peek(self) -> Optional[str]:
+        peek_pos = self.pos + 1
+        if peek_pos > len(self.text) - 1:
+            return None
+        return self.text[peek_pos]
+
     def get_next_token(self) -> Token:
         """Lexical analyzer (also known as scanner or tokenizer)
         This method is responsible for breaking a sentence
@@ -80,6 +102,22 @@ class Lexer:
             if self.current_char == ")":
                 self._advance()
                 return Token(TokenType.RPAREN, ")")
+
+            if self.current_char.isalpha():
+                return self._id()
+
+            if self.current_char == ':' and self._peek() == '=':
+                self._advance()
+                self._advance()
+                return Token(TokenType.ASSIGN, ':=')
+
+            if self.current_char == ';':
+                self._advance()
+                return Token(TokenType.SEMI, ';')
+
+            if self.current_char == '.':
+                self._advance()
+                return Token(TokenType.DOT, '.')
 
             self._error()
 
