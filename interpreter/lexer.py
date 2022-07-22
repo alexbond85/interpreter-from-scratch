@@ -4,8 +4,8 @@ from typing import Optional
 from interpreter.token import Token, TokenType
 
 RESERVED_KEYWORDS = {
-    'BEGIN': Token(TokenType.BEGIN, 'BEGIN'),
-    'END': Token(TokenType.END, 'END'),
+    "BEGIN": Token(TokenType.BEGIN, "BEGIN"),
+    "END": Token(TokenType.END, "END"),
 }
 
 
@@ -51,7 +51,7 @@ class Lexer:
 
     def _id(self):
         """Handle identifiers and reserved keywords"""
-        result = ''
+        result = ""
         while self.current_char is not None and self.current_char.isalnum():
             result += self.current_char
             self._advance()
@@ -106,18 +106,18 @@ class Lexer:
             if self.current_char.isalpha():
                 return self._id()
 
-            if self.current_char == ':' and self._peek() == '=':
+            if self.current_char == ":" and self._peek() == "=":
                 self._advance()
                 self._advance()
-                return Token(TokenType.ASSIGN, ':=')
+                return Token(TokenType.ASSIGN, ":=")
 
-            if self.current_char == ';':
+            if self.current_char == ";":
                 self._advance()
-                return Token(TokenType.SEMI, ';')
+                return Token(TokenType.SEMI, ";")
 
-            if self.current_char == '.':
+            if self.current_char == ".":
                 self._advance()
-                return Token(TokenType.DOT, '.')
+                return Token(TokenType.DOT, ".")
 
             self._error()
 

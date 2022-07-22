@@ -58,7 +58,7 @@ def test_get_next_token():
     assert token == Token(TokenType.MINUS, value="-")
     token = lexer.get_next_token()
     assert token == Token(TokenType.EOF, None)
-    lexer = Lexer('BEGIN a := 2; END.')
+    lexer = Lexer("BEGIN a := 2; END.")
     assert lexer.get_next_token() == Token(TokenType.BEGIN, "BEGIN")
     assert lexer.get_next_token() == Token(TokenType.ID, "a")
     assert lexer.get_next_token() == Token(TokenType.ASSIGN, ":=")

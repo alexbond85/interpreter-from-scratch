@@ -1,7 +1,16 @@
 from dataclasses import dataclass
-from typing import NoReturn
+from typing import List, NoReturn
 
-from interpreter.ast import AST, BinOp, Num, UnaryOp
+from interpreter.ast import (
+    AST,
+    Assign,
+    BinOp,
+    Compound,
+    NoOp,
+    Num,
+    UnaryOp,
+    Var,
+)
 from interpreter.lexer import Lexer
 from interpreter.token import Token, TokenType
 
@@ -48,7 +57,9 @@ class Parser:
             node_expr: AST = self.expr()
             self.eat(TokenType.RPAREN)
             return node_expr
-        self._error()
+        else:
+            node_variable = self.variable()
+            return node_variable
 
     def term(self) -> AST:
         """term : factor ((MUL | DIV) factor)*"""
@@ -84,5 +95,82 @@ class Parser:
 
         return node
 
-    def parse(self):
-        self.expr()
+    def program(self):
+        """program : compound_statement DOT"""
+        node = self.compound_statement()
+        self.eat(TokenType.DOT)
+        return node
+
+    def statement(self):
+        """
+        statement : compound_statement
+                  | assignment_statement
+                  | empty
+        """
+        if self.current_token.type_ == TokenType.BEGIN:
+            node = self.compound_statement()
+        elif self.current_token.type_ == TokenType.ID:
+            node = self.assignment_statement()
+        else:
+            node = self.empty()
+        return node
+
+    def statement_list(self) -> List[AST]:
+        """
+        statement_list : statement
+                       | statement SEMI statement_list
+        """
+        node = self.statement()
+
+        results = [node]
+
+        while self.current_token.type_ == TokenType.SEMI:
+            self.eat(TokenType.SEMI)
+            results.append(self.statement())
+
+        if self.current_token.type_ == TokenType.ID:
+            self._error()
+
+        return results
+
+    def assignment_statement(self) -> AST:
+        """
+        assignment_statement : variable ASSIGN expr
+        """
+        left = self.variable()
+        token = self.current_token
+        self.eat(TokenType.ASSIGN)
+        right = self.expr()
+        node = Assign(left, token, right)
+        return node
+
+    def variable(self) -> AST:
+        """
+        variable : ID
+        """
+        node = Var(self.current_token)
+        self.eat(TokenType.ID)
+        return node
+
+    def empty(self) -> AST:
+        """An empty production"""
+        return NoOp()
+
+    def compound_statement(self) -> AST:
+        """
+        compound_statement: BEGIN statement_list END
+        """
+        self.eat(TokenType.BEGIN)
+        nodes = self.statement_list()
+        self.eat(TokenType.END)
+
+        root = Compound()
+        for node in nodes:
+            root.children.append(node)
+        return root
+
+    def parse(self) -> AST:
+        node = self.program()
+        if self.current_token.type_ != TokenType.EOF:
+            self._error()
+        return node

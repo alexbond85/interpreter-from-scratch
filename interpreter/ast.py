@@ -1,11 +1,66 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, List
 
 from interpreter.token import Token
 
 
+#     program : compound_statement DOT
+#
+#     compound_statement : BEGIN statement_list END
+#
+#     statement_list : statement
+#                    | statement SEMI statement_list
+#
+#     statement : compound_statement
+#               | assignment_statement
+#               | empty
+#
+#     assignment_statement : variable ASSIGN expr
+#
+#     empty :
+#
+#     expr: term ((PLUS | MINUS) term)*
+#
+#     term: factor ((MUL | DIV) factor)*
+#
+#     factor : PLUS factor
+#            | MINUS factor
+#            | INTEGER
+#            | LPAREN expr RPAREN
+#            | variable
+#
+#     variable: ID
+
+
 class AST:
     pass
+
+
+class NoOp(AST):
+    pass
+
+
+class Compound(AST):
+    """Represents a 'BEGIN ... END' block"""
+
+    def __init__(self):
+        self.children: List[AST] = []
+
+
+class Assign(AST):
+    def __init__(self, left: AST, op: Token, right: AST):
+        self.left = left
+        self.token = op
+        self.op = op
+        self.right = right
+
+
+class Var(AST):
+    """The Var node is constructed out of ID token."""
+
+    def __init__(self, token: Token):
+        self.token = token
+        self.value = token.value
 
 
 @dataclass
