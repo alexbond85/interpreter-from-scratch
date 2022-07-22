@@ -57,6 +57,7 @@ class Interpreter(NodeVisitor):
             return +self.visit(node.expr)
         elif op == TokenType.MINUS:
             return -self.visit(node.expr)
+        self._error()
 
     def run(self) -> int:
         return self.visit(self.parser.expr())

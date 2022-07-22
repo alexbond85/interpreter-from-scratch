@@ -34,20 +34,20 @@ class Parser:
         token = self.current_token
         if token.type_ == TokenType.PLUS:
             self.eat(TokenType.PLUS)
-            node = UnaryOp(token, self.factor())
-            return node
+            unary_node_plus = UnaryOp(token, self.factor())
+            return unary_node_plus
         elif token.type_ == TokenType.MINUS:
             self.eat(TokenType.MINUS)
-            node = UnaryOp(token, self.factor())
-            return node
+            unary_node_minus = UnaryOp(token, self.factor())
+            return unary_node_minus
         if token.type_ == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
             return Num(token)
         elif token.type_ == TokenType.LPAREN:
             self.eat(TokenType.LPAREN)
-            node = self.expr()
+            node_expr: AST = self.expr()
             self.eat(TokenType.RPAREN)
-            return node
+            return node_expr
         self._error()
 
     def term(self) -> AST:
