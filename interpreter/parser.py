@@ -95,13 +95,13 @@ class Parser:
 
         return node
 
-    def program(self):
+    def program(self) -> AST:
         """program : compound_statement DOT"""
         node = self.compound_statement()
         self.eat(TokenType.DOT)
         return node
 
-    def statement(self):
+    def statement(self) -> AST:
         """
         statement : compound_statement
                   | assignment_statement
@@ -137,11 +137,11 @@ class Parser:
         """
         assignment_statement : variable ASSIGN expr
         """
-        left = self.variable()
+        left: AST = self.variable()
         token = self.current_token
         self.eat(TokenType.ASSIGN)
-        right = self.expr()
-        node = Assign(left, token, right)
+        right: AST = self.expr()
+        node: AST = Assign(left, token, right)
         return node
 
     def variable(self) -> AST:

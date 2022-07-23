@@ -3,7 +3,7 @@ from typing import Callable, NoReturn
 
 
 from interpreter.parser import Parser
-from interpreter.ast import Num, BinOp, UnaryOp
+from interpreter.ast import AST, Num, BinOp, UnaryOp
 from interpreter.token import TokenType
 
 
@@ -13,7 +13,7 @@ class InterpreterError(Exception):
 
 
 class NodeVisitor(object):
-    def visit(self, node):
+    def visit(self, node: AST):
         method_name = "visit_" + type(node).__name__
         visitor: Callable = getattr(self, method_name, self.generic_visit)
         return visitor(node)
@@ -31,6 +31,7 @@ class Interpreter(NodeVisitor):
 
     def __init__(self, parser: Parser):
         self.parser = parser
+        self.GLOBAL_SCOPE: dict = {}
 
     def _error(self) -> NoReturn:
         raise InterpreterError("Invalid syntax")
@@ -59,5 +60,24 @@ class Interpreter(NodeVisitor):
             return -self.visit(node.expr)
         self._error()
 
+    def visit_Compound(self, node):
+        for child in node.children:
+            self.visit(child)
+
+    def visit_NoOp(self, node):
+        pass
+
+    def visit_Assign(self, node):
+        var_name = node.left.value
+        self.GLOBAL_SCOPE[var_name] = self.visit(node.right)
+
+    def visit_Var(self, node):
+        var_name = node.value
+        val = self.GLOBAL_SCOPE.get(var_name)
+        if val is None:
+            raise NameError(repr(var_name))
+        else:
+            return val
+
     def run(self) -> int:
-        return self.visit(self.parser.expr())
+        return self.visit(self.parser.parse())
