@@ -6,6 +6,11 @@ from interpreter.token import Token, TokenType
 RESERVED_KEYWORDS = {
     "BEGIN": Token(TokenType.BEGIN, "BEGIN"),
     "END": Token(TokenType.END, "END"),
+    "PROGRAM": Token(TokenType.PROGRAM, "PROGRAM"),
+    "VAR": Token(TokenType.VAR, "VAR"),
+    "DIV": Token(TokenType.DIV, "DIV"),
+    "INTEGER": Token(TokenType.INTEGER, "INTEGER"),
+    "REAL": Token(TokenType.REAL, "REAL"),
 }
 
 
@@ -41,13 +46,33 @@ class Lexer:
         while self.current_char is not None and self.current_char.isspace():
             self._advance()
 
-    def _integer(self) -> int:
-        """Return a (multidigit) integer consumed from the input."""
+    def _skip_comment(self):
+        while self.current_char != "}":
+            self._advance()
+        self._advance()  # the closing curly brace
+
+    def _number(self) -> Token:
+        """Return a (multidigit) integer or float consumed from the input."""
         result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self._advance()
-        return int(result)
+
+        if self.current_char == ".":
+            result += self.current_char
+            self._advance()
+
+            while (
+                self.current_char is not None and self.current_char.isdigit()
+            ):
+                result += self.current_char
+                self._advance()
+
+            token = Token(TokenType.REAL_CONST, float(result))
+        else:
+            token = Token(TokenType.INTEGER_CONST, int(result))
+
+        return token
 
     def _id(self):
         """Handle identifiers and reserved keywords"""
@@ -77,7 +102,7 @@ class Lexer:
                 continue
 
             if self.current_char.isdigit():
-                return Token(TokenType.INTEGER, self._integer())
+                return self._number()
 
             if self.current_char == "*":
                 self._advance()
@@ -85,7 +110,7 @@ class Lexer:
 
             if self.current_char == "/":
                 self._advance()
-                return Token(TokenType.DIV, "/")
+                return Token(TokenType.FLOAT_DIV, "/")
 
             if self.current_char == "+":
                 self._advance()
@@ -111,6 +136,10 @@ class Lexer:
                 self._advance()
                 return Token(TokenType.ASSIGN, ":=")
 
+            if self.current_char == ':':
+                self._advance()
+                return Token(TokenType.COLON, ':')
+
             if self.current_char == ";":
                 self._advance()
                 return Token(TokenType.SEMI, ";")
@@ -118,6 +147,15 @@ class Lexer:
             if self.current_char == ".":
                 self._advance()
                 return Token(TokenType.DOT, ".")
+
+            if self.current_char == ',':
+                self._advance()
+                return Token(TokenType.COMMA, ',')
+
+            if self.current_char == "{":
+                self._advance()
+                self._skip_comment()
+                continue
 
             self._error()
 

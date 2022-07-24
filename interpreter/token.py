@@ -15,11 +15,13 @@ from typing import Any
 
 class TokenType(Enum):
     INTEGER = auto()
+    REAL = auto()
     PLUS = auto()
     EOF = auto()
     MINUS = auto()
     MUL = auto()
     DIV = auto()
+    FLOAT_DIV = auto()
     LPAREN = auto()
     RPAREN = auto()
     BEGIN = auto()
@@ -28,6 +30,13 @@ class TokenType(Enum):
     SEMI = auto()
     ASSIGN = auto()
     DOT = auto()
+    PROGRAM = auto()
+    VAR = auto()
+    DEV = auto()
+    REAL_CONST = auto()
+    INTEGER_CONST = auto()
+    COLON = auto()
+    COMMA = auto()
 
 
 @dataclass

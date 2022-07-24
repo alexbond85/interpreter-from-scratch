@@ -17,8 +17,8 @@ def test_eat():
     text = "    5      + 2 "
     lexer = Lexer(text)
     parser = Parser(lexer=lexer)
-    parser.eat(TokenType.INTEGER)
+    parser.eat(TokenType.INTEGER_CONST)
     with pytest.raises(InterpreterParserError):
         parser.eat(TokenType.MINUS)
     parser.eat(TokenType.PLUS)
-    parser.eat(TokenType.INTEGER)
+    parser.eat(TokenType.INTEGER_CONST)

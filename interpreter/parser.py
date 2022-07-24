@@ -49,8 +49,8 @@ class Parser:
             self.eat(TokenType.MINUS)
             unary_node_minus = UnaryOp(token, self.factor())
             return unary_node_minus
-        if token.type_ == TokenType.INTEGER:
-            self.eat(TokenType.INTEGER)
+        if token.type_ == TokenType.INTEGER_CONST:
+            self.eat(TokenType.INTEGER_CONST)
             return Num(token)
         elif token.type_ == TokenType.LPAREN:
             self.eat(TokenType.LPAREN)
